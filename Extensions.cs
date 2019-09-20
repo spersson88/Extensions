@@ -116,17 +116,44 @@ static class Extensions
                 a[a.Length - 1 - i] = temp;
             }
         }
+
         /// <summary>
-        /// Swap two places in array.
+        /// Shuffle an IList
         /// </summary>
-        /// <typeparam name="T">Type of array</typeparam>
-        /// <param name="a">Array to perform swap on.</param>
-        /// <param name="firstIndex">First index to swap.</param>
-        /// <param name="secondIndex">Second index to swap.</param>
-        public static void Swap<T>(this T[] a, int firstIndex, int secondIndex)
+        /// <typeparam name="T">Type of IList</typeparam>
+        /// <param name="a">IList to shuffle.</param>
+        /// <param name="r">Random used to randomize new position.</param>
+        public static void Shuffle<T>(this IList<T> a, Random r)
         {
-            var temp = a[firstIndex];
-            a[firstIndex] = a[secondIndex];
-            a[secondIndex] = temp;
+            for (var i = 0; i < a.Count - 1; i++)
+                a.Swap(i, r.Next(i, a.Count));
+        }
+
+        /// <summary>
+        /// Swap two places in IList.
+        /// </summary>
+        /// <typeparam name="T">Type of IList</typeparam>
+        /// <param name="a">IList to perform swap on.</param>
+        /// <param name="i">First index to swap.</param>
+        /// <param name="j">Second index to swap.</param>
+        public static void Swap<T>(this IList<T> a, int i, int j)
+        {
+            var temp = a[i];
+            a[i] = a[j];
+            a[j] = temp;
+        }
+
+        /// <summary>
+        /// Batch an IEnumerable
+        /// </summary>
+        /// <typeparam name="T">Type of IEnumerable.</typeparam>
+        /// <param name="items">Items to batch.</param>
+        /// <param name="maxItems">Max items in batch.</param>
+        /// <returns></returns>
+        public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> items, int maxItems)
+        {
+            return items.Select((item, inx) => new { item, inx })
+                .GroupBy(x => x.inx / maxItems)
+                .Select(g => g.Select(x => x.item));
         }
 }
